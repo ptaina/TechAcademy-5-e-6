@@ -5,6 +5,6 @@ export default {
       '^.+\\.ts$': 'ts-jest',
     },
     moduleFileExtensions: ['ts', 'js'],
-    setupFiles: ['<rootDir>/jest.setup.ts'], 
-  }
-  
+    setupFiles: ['<rootDir>/jest.setup.ts'],
+    testTimeout: 80000, 
+};

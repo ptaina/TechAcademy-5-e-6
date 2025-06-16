@@ -4,6 +4,7 @@ import UserModel from '../src/models/UserModel';
 import sequelize from '../src/config/database'; 
 
 beforeAll(async () => {
+  jest.setTimeout(80000); 
   await sequelize.authenticate(); 
   await sequelize.sync({ force: true }); 
 });

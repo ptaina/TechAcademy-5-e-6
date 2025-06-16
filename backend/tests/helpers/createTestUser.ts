@@ -1,33 +1,24 @@
-
-import bcrypt from 'bcryptjs';
 import UserModel from '../../src/models/UserModel';
-import { cpf } from 'faker-br'; 
+import { cpf } from 'cpf-cnpj-validator';
 
-export const createTestUser = async () => {
+export const createTestUser = async (password = 'DeanTeAmo23') => {
   try {
     
-    const randomCpf = cpf.generate();
-
-  
+    const randomCpf = cpf.generate(); 
     const uniqueEmail = `user${Date.now()}@example.com`;
 
-   
-    const hashedPassword = await bcrypt.hash('DeanTeAmo23', 10);
-
     
-    await UserModel.destroy({ where: { cpf: randomCpf } });
-
-
     const user = await UserModel.create({
       name: 'Jimmy Novak',
       email: uniqueEmail,
-      password: hashedPassword,
+      password: password,
       cpf: randomCpf,
     });
 
-    return user;
+    
+    return { user, password };
   } catch (err) {
-    console.error('Erro ao criar usuário de teste:', err);
+    console.error('Error creating test user:', err);
     throw err;
   }
 };

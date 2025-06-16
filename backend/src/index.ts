@@ -29,7 +29,7 @@ app.use(appointmentRoutes);
 const syncDatabase = async () => {
     try {
         if (process.env.NODE_ENV !== 'test') {
-            associateModels(); // 👈 Chame aqui ANTES do sync
+            associateModels(); 
             await sequelize.sync({ alter: true });
             /*console.log('Database sincronizado com sucesso')*/
         }
