@@ -15,6 +15,7 @@
   "description": "",
   "devDependencies": {
     "@faker-js/faker": "^9.8.0",
+    "@types/cors": "^2.8.19",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.13",
@@ -33,6 +34,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
     "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "gerador-validador-cpf": "^6.0.0",
