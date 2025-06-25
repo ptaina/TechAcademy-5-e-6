@@ -43,7 +43,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
       <aside className="w-64 flex-shrink-0 bg-gray-800 text-white flex flex-col p-4">
         <div className="flex items-center justify-center text-2xl font-bold mb-10 text-center">
           <HeartPulse className="mr-2 text-blue-400" />
-          <span>MedConnect</span>
+          <span>medconnect</span>
         </div>
         <nav className="flex-grow">
           <ul>

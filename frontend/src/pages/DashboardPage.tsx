@@ -47,7 +47,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     <div className="flex h-screen w-full bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 bg-gray-800 text-white flex flex-col p-4">
-        <div className="text-2xl font-bold mb-10 text-center">MedConnect</div>
+        <div className="text-2xl font-bold mb-10 text-center">medconnect</div>
         <nav className="flex-grow">
           <ul>
             <NavItem
