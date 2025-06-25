@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "tailwind:init": "tailwindcss init -p",
     "test": "playwright test",
-    "testui": "playwright test --ui"
+    "testui": "playwright test --ui",
+    "prepare": "husky"
   },
   "dependencies": {
     "axios": "^1.10.0",
@@ -21,6 +22,8 @@
     "react-router-dom": "^7.6.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^9.25.0",
     "@playwright/test": "^1.53.1",
     "@types/node": "^24.0.4",
