@@ -4,6 +4,9 @@ import api from "../services/api";
 import type { Patient } from "../types";
 import Modal from "../components/Modal";
 import Input from "../components/Input";
+import Notification from "../components/Notification";
+import ConfirmModal from "../components/ConfirmModal";
+import { useNotification } from "../hooks/useNotification";
 import { PlusCircle, Edit, Trash2, ArrowLeft } from "lucide-react";
 
 const PatientsPage: React.FC = () => {
@@ -18,7 +21,13 @@ const PatientsPage: React.FC = () => {
     phone: "",
     address: "",
   });
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    id: number | null;
+  }>({ isOpen: false, id: null });
   const navigate = useNavigate();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   const fetchPatients = async () => {
     try {
@@ -57,16 +66,22 @@ const PatientsPage: React.FC = () => {
 
   const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm("Tem a certeza de que deseja remover este paciente?")) {
-      try {
-        await api.delete(`/patients/${id}`);
-        fetchPatients();
-      } catch (err) {
-        alert(
-          err instanceof Error ? err.message : "Falha ao remover paciente."
-        );
-      }
+  const handleDelete = (id: number) => {
+    setConfirmModal({ isOpen: true, id });
+  };
+
+  const confirmDelete = async () => {
+    if (!confirmModal.id) return;
+    try {
+      await api.delete(`/patients/${confirmModal.id}`);
+      fetchPatients();
+      showSuccess("Paciente removido com sucesso!");
+    } catch (err) {
+      showError(
+        err instanceof Error ? err.message : "Falha ao remover paciente."
+      );
+    } finally {
+      setConfirmModal({ isOpen: false, id: null });
     }
   };
 
@@ -75,13 +90,17 @@ const PatientsPage: React.FC = () => {
     try {
       if (editingPatient) {
         await api.put(`/patients/${editingPatient.id}`, formData);
+        showSuccess("Paciente atualizado com sucesso!");
       } else {
         await api.post("/patients", formData);
+        showSuccess("Paciente criado com sucesso!");
       }
       handleCloseModal();
       fetchPatients();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Falha ao salvar paciente.");
+      showError(
+        err instanceof Error ? err.message : "Falha ao salvar paciente."
+      );
     }
   };
 
@@ -90,6 +109,20 @@ const PatientsPage: React.FC = () => {
 
   return (
     <div>
+      <Notification
+        message={notification.message}
+        type={notification.type}
+        isVisible={notification.isVisible}
+        onClose={hideNotification}
+      />
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        message="Tem a certeza de que deseja remover este paciente?"
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmModal({ isOpen: false, id: null })}
+        confirmText="Sim"
+        cancelText="Não"
+      />
       <button
         onClick={() => navigate(-1)}
         className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:underline mb-6"

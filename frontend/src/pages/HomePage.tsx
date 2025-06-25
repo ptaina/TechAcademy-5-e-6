@@ -70,7 +70,7 @@ const HomePage: React.FC = () => {
         Olá, {user?.name || user?.email}!
       </h1>
       <p className="mt-2 text-gray-600 dark:text-gray-400">
-        Bem-vindo(a) de volta ao seu painel de controle.
+        Bem-vindo(a) de volta ao seu painel de controle, Lindda.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         <StatCard

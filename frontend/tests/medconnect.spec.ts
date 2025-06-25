@@ -6,7 +6,7 @@ import {
   generateValidCPF,
 } from "./helpers/test-helpers";
 
-test.describe("Testes E2E - MedConnect", () => {
+test.describe("Testes E2E - medconnect", () => {
   const getFieldByLabelText = (page, text: string) => {
     return page.getByText(text, { exact: true }).locator("..").locator("input");
   };
@@ -60,14 +60,14 @@ test.describe("Testes E2E - MedConnect", () => {
       await page.goto("/login");
       await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible();
 
-      await getFieldByLabelText(page, "Email").fill("elissonmatos@gmail.com");
+      await getFieldByLabelText(page, "Email").fill("taina@gmail.com");
       await getFieldByLabelText(page, "Senha").fill("tainaElisson15");
       await page.getByRole("button", { name: "Entrar" }).click();
 
       await expect(page).toHaveURL("/");
 
       const heading = page.locator("h1");
-      await expect(heading).toContainText("Olá, Elisson Matos");
+      await expect(heading).toContainText("Olá, Taina Pereira");
     });
 
     test("deve mostrar erro com credenciais de login inválidas", async ({
@@ -76,7 +76,7 @@ test.describe("Testes E2E - MedConnect", () => {
       await page.goto("/login");
       await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible();
 
-      await getFieldByLabelText(page, "Email").fill("elissonmatos@gmail.com");
+      await getFieldByLabelText(page, "Email").fill("taina@gmail.com");
       await getFieldByLabelText(page, "Senha").fill("senhaerrada");
       await page.getByRole("button", { name: "Entrar" }).click();
 
@@ -91,7 +91,7 @@ test.describe("Testes E2E - MedConnect", () => {
       await page.goto("/login");
       await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible();
 
-      await getFieldByLabelText(page, "Email").fill("elissonmatos@gmail.com");
+      await getFieldByLabelText(page, "Email").fill("taina@gmail.com");
       await getFieldByLabelText(page, "Senha").fill("tainaElisson15");
       await page.getByRole("button", { name: "Entrar" }).click();
       await expect(page).toHaveURL("/");
@@ -109,6 +109,7 @@ test.describe("Testes E2E - MedConnect", () => {
       await getFieldByLabelText(page, "Especialidade").fill("Ortopedia");
       await getFieldByLabelText(page, "CRM").fill(crm);
       await page.getByRole("button", { name: "Salvar" }).click();
+      await expect(page.getByText("Médico criado com sucesso!")).toBeVisible();
       await expect(page.getByRole("cell", { name: doctorName })).toBeVisible();
 
       const row = page.locator("tr").filter({ hasText: doctorName });
@@ -116,11 +117,20 @@ test.describe("Testes E2E - MedConnect", () => {
       await getFieldByLabelText(page, "Especialidade").fill("Fisioterapia");
       await page.getByRole("button", { name: "Salvar" }).click();
       await expect(
+        page.getByText("Médico atualizado com sucesso!")
+      ).toBeVisible();
+      await expect(
         page.getByRole("cell", { name: "Fisioterapia" })
       ).toBeVisible();
 
-      page.on("dialog", (dialog) => dialog.accept());
       await row.getByRole("button").last().click();
+      await expect(
+        page.getByText("Tem a certeza de que deseja remover este médico?")
+      ).toBeVisible();
+      await page.getByRole("button", { name: "Sim" }).click();
+      await expect(
+        page.getByText("Médico removido com sucesso!")
+      ).toBeVisible();
       await expect(
         page.getByRole("cell", { name: doctorName })
       ).not.toBeVisible();
@@ -129,20 +139,12 @@ test.describe("Testes E2E - MedConnect", () => {
     test("caso de falha: não deve criar médico com CRM inválido", async ({
       page,
     }) => {
-      let dialogMessage = "";
-      page.on("dialog", async (dialog) => {
-        dialogMessage = dialog.message();
-        await dialog.dismiss();
-      });
-
       await page.getByRole("button", { name: "Novo Médico" }).click();
       await getFieldByLabelText(page, "Nome").fill("Dr. Erro");
       await getFieldByLabelText(page, "Especialidade").fill("Clínica Geral");
       await getFieldByLabelText(page, "CRM").fill("CRM-ERRADO");
       await page.getByRole("button", { name: "Salvar" }).click();
-
-      await page.waitForEvent("dialog");
-      expect(dialogMessage).toContain("CRM must be in the format");
+      await expect(page.getByText(/CRM must be in the format/)).toBeVisible();
     });
   });
 
@@ -151,7 +153,7 @@ test.describe("Testes E2E - MedConnect", () => {
       await page.goto("/login");
       await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible();
 
-      await getFieldByLabelText(page, "Email").fill("elissonmatos@gmail.com");
+      await getFieldByLabelText(page, "Email").fill("taina@gmail.com");
       await getFieldByLabelText(page, "Senha").fill("tainaElisson15");
       await page.getByRole("button", { name: "Entrar" }).click();
       await expect(page).toHaveURL("/");
@@ -170,6 +172,9 @@ test.describe("Testes E2E - MedConnect", () => {
       await getFieldByLabelText(page, "Telefone").fill("51999998888");
       await getFieldByLabelText(page, "Endereço").fill("Av. dos Testes, 789");
       await page.getByRole("button", { name: "Salvar" }).click();
+      await expect(
+        page.getByText("Paciente criado com sucesso!")
+      ).toBeVisible();
       await expect(page.getByRole("cell", { name: patientName })).toBeVisible();
 
       const row = page.locator("tr").filter({ hasText: patientName });
@@ -177,11 +182,20 @@ test.describe("Testes E2E - MedConnect", () => {
       await getFieldByLabelText(page, "Telefone").fill("51777776666");
       await page.getByRole("button", { name: "Salvar" }).click();
       await expect(
+        page.getByText("Paciente atualizado com sucesso!")
+      ).toBeVisible();
+      await expect(
         page.getByRole("cell", { name: "51777776666" })
       ).toBeVisible();
 
-      page.on("dialog", (dialog) => dialog.accept());
       await row.getByRole("button").last().click();
+      await expect(
+        page.getByText("Tem a certeza de que deseja remover este paciente?")
+      ).toBeVisible();
+      await page.getByRole("button", { name: "Sim" }).click();
+      await expect(
+        page.getByText("Paciente removido com sucesso!")
+      ).toBeVisible();
       await expect(
         page.getByRole("cell", { name: patientName })
       ).not.toBeVisible();
@@ -200,21 +214,13 @@ test.describe("Testes E2E - MedConnect", () => {
       await page.getByRole("button", { name: "Salvar" }).click();
       await expect(page.getByRole("cell", { name: patientName })).toBeVisible();
 
-      let dialogMessage = "";
-      page.on("dialog", async (dialog) => {
-        dialogMessage = dialog.message();
-        await dialog.dismiss();
-      });
-
       await page.getByRole("button", { name: "Novo Paciente" }).click();
       await getFieldByLabelText(page, "Nome").fill("Paciente Duplicado");
       await getFieldByLabelText(page, "CPF").fill(existingCPF);
       await getFieldByLabelText(page, "Telefone").fill("22222222222");
       await getFieldByLabelText(page, "Endereço").fill("Rua da Duplicata");
       await page.getByRole("button", { name: "Salvar" }).click();
-
-      await page.waitForEvent("dialog");
-      expect(dialogMessage).toContain("CPF already registered");
+      await expect(page.getByText(/CPF already registered/)).toBeVisible();
     });
   });
 });

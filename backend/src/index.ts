@@ -9,7 +9,7 @@ import appointmentRoutes from "./routes/appointmentRoutes";
 import { associateModels } from "./models/associateModels";
 
 const app = express();
-const port = 3001;
+const port = 3000;
 
 app.use(express.json());
 

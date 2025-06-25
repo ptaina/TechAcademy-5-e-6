@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import type { Patient, Doctor, Appointment } from "../types";
 import Modal from "../components/Modal";
+import Notification from "../components/Notification";
+import ConfirmModal from "../components/ConfirmModal";
+import { useNotification } from "../hooks/useNotification";
 import { PlusCircle, ArrowLeft } from "lucide-react";
 
 const AppointmentsPage: React.FC = () => {
@@ -18,7 +21,20 @@ const AppointmentsPage: React.FC = () => {
     doctorId: "",
     date: "",
   });
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    id: number | null;
+    status: "completed" | "canceled" | null;
+  }>({ isOpen: false, id: null, status: null });
+
   const navigate = useNavigate();
+  const {
+    notification,
+    showSuccess,
+    showError,
+    showWarning,
+    hideNotification,
+  } = useNotification();
 
   const fetchData = async () => {
     try {
@@ -43,23 +59,26 @@ const AppointmentsPage: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleStatusChange = async (
-    id: number,
-    status: "completed" | "canceled"
-  ) => {
-    if (
-      window.confirm(
-        `Tem a certeza de que deseja marcar este agendamento como "${status}"?`
-      )
-    ) {
-      try {
-        await api.put(`/appointments/${id}/status`, { status });
-        fetchData();
-      } catch (err) {
-        alert(
-          err instanceof Error ? err.message : "Falha ao atualizar status."
-        );
-      }
+  const handleStatusChange = (id: number, status: "completed" | "canceled") => {
+    setConfirmModal({ isOpen: true, id, status });
+  };
+
+  const confirmStatusChange = async () => {
+    if (!confirmModal.id || !confirmModal.status) return;
+    try {
+      await api.put(`/appointments/${confirmModal.id}/status`, {
+        status: confirmModal.status,
+      });
+      fetchData();
+      showSuccess(
+        `Agendamento marcado como ${confirmModal.status} com sucesso!`
+      );
+    } catch (err) {
+      showError(
+        err instanceof Error ? err.message : "Falha ao atualizar status."
+      );
+    } finally {
+      setConfirmModal({ isOpen: false, id: null, status: null });
     }
   };
 
@@ -70,7 +89,7 @@ const AppointmentsPage: React.FC = () => {
       !newAppointment.doctorId ||
       !newAppointment.date
     ) {
-      alert("Por favor, preencha todos os campos.");
+      showWarning("Por favor, preencha todos os campos.");
       return;
     }
     try {
@@ -78,8 +97,11 @@ const AppointmentsPage: React.FC = () => {
       setIsModalOpen(false);
       setNewAppointment({ patientId: "", doctorId: "", date: "" });
       fetchData();
+      showSuccess("Agendamento criado com sucesso!");
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Falha ao criar agendamento.");
+      showError(
+        err instanceof Error ? err.message : "Falha ao criar agendamento."
+      );
     }
   };
 
@@ -88,6 +110,22 @@ const AppointmentsPage: React.FC = () => {
 
   return (
     <div>
+      <Notification
+        message={notification.message}
+        type={notification.type}
+        isVisible={notification.isVisible}
+        onClose={hideNotification}
+      />
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        message={`Tem a certeza de que deseja marcar este agendamento como "${confirmModal.status}"?`}
+        onConfirm={confirmStatusChange}
+        onCancel={() =>
+          setConfirmModal({ isOpen: false, id: null, status: null })
+        }
+        confirmText="Sim"
+        cancelText="Não"
+      />
       <button
         onClick={() => navigate(-1)}
         className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:underline mb-6"
@@ -218,7 +256,7 @@ const AppointmentsPage: React.FC = () => {
                 <option value="">Selecione um médico</option>
                 {doctors.map((d) => (
                   <option key={d.id} value={d.id}>
-                    {d.name} ({d.speciality})
+                    {d.name} - {d.speciality}
                   </option>
                 ))}
               </select>
@@ -231,7 +269,10 @@ const AppointmentsPage: React.FC = () => {
                 type="datetime-local"
                 value={newAppointment.date}
                 onChange={(e) =>
-                  setNewAppointment({ ...newAppointment, date: e.target.value })
+                  setNewAppointment({
+                    ...newAppointment,
+                    date: e.target.value,
+                  })
                 }
                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 required
@@ -250,7 +291,7 @@ const AppointmentsPage: React.FC = () => {
               type="submit"
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
             >
-              Salvar
+              Criar
             </button>
           </div>
         </form>

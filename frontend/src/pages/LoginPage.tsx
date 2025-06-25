@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
     <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
       <div className="flex items-center justify-center text-3xl font-bold text-gray-900 dark:text-white">
         <HeartPulse className="mr-3 h-8 w-8 text-blue-500" />
-        <span>MedConnect</span>
+        <span>medconnect</span>
       </div>
       <h2 className="text-xl font-bold text-center text-gray-900 dark:text-white pt-4">
         Login
